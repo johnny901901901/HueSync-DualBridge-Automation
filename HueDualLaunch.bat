@@ -1,42 +1,51 @@
 @echo off
-:: =====================================================================
-:: Dual Hue Sync Launch Script
-:: Optimized for high-speed NVMe/RTX 5090 systems
-:: =====================================================================
+setlocal
+
+:: ======================================================================
+:: USER CONFIGURATION
+:: ======================================================================
+:: Folder where you keep your scripts and handle64.exe
+set "SCRIPT_DIR=C:\Scripts"
+
+:: Tool name: handle64.exe (64-bit) or handle.exe (32-bit)
+set "HANDLE_EXE=handle64.exe"
+
+:: Path to Hue Sync installation
+set "HUE_APP=C:\Program Files\Hue Sync\HueSync.exe"
+:: ======================================================================
 
 set "ROAM_REAL=%AppData%\HueSync"
 set "ROAM_ALT=%AppData%\HueSync2"
 set "LOCAL_REAL=%LocalAppData%\Signify"
 set "LOCAL_ALT=%LocalAppData%\Signify2"
 
-:: 1. Force close any existing instances
+:: 1. Force close silently
 taskkill /f /im HueSync.exe /t >nul 2>&1
 timeout /t 5 /nobreak >nul
 
-:: 2. Launch Instance 1 (Monitor A / Bridge A)
-start /min "" "C:\Program Files\Hue Sync\HueSync.exe"
+:: 2. Launch Instance 1
+start /min "" "%HUE_APP%"
 timeout /t 15 /nobreak >nul
 
-:: 3. Kill the 'Mutant' single-instance lock handle
-:: Uses Sysinternals handle64.exe
-for /f "tokens=3,6 delims=: " %%I in ('handle64.exe -accepteula -a -p HueSync.exe "Philips Hue Sync" ^| findstr /i "Mutant"') do (
-    handle64.exe -accepteula -c %%J -y -p %%I >nul 2>&1
+:: 3. Kill the 'Mutant' lock handle
+for /f "tokens=3,6 delims=: " %%I in ('%SCRIPT_DIR%\%HANDLE_EXE% -accepteula -a -p HueSync.exe "Philips Hue Sync" ^| findstr /i "Mutant"') do (
+    %SCRIPT_DIR%\%HANDLE_EXE% -accepteula -c %%J -y -p %%I >nul 2>&1
 )
 
-:: 4. THE SWAP: Switch folder identities for Instance 2
+:: 4. THE FOLDER SWAP (Identity Shift)
 ren "%ROAM_REAL%" "HueSync_Temp"
 ren "%ROAM_ALT%" "HueSync"
 ren "%LOCAL_REAL%" "Signify_Temp"
 ren "%LOCAL_ALT%" "Signify"
 
-:: 5. Launch Instance 2 (Monitor B / Bridge B)
-start /min "" "C:\Program Files\Hue Sync\HueSync.exe"
+:: 5. Launch Instance 2
+start /min "" "%HUE_APP%"
 
-:: 6. THE STABILITY SHIELD
-:: This prevents Monitor A from writing settings into Monitor B's folders
+:: 6. THE STABILITY SHIELD (40s wait)
+:: This is set to 40s to try and prevent settings drift, but it remains finicky.
 timeout /t 40 /nobreak >nul
 
-:: 7. REVERSE SWAP: Return folders to original state
+:: 7. REVERSE SWAP (Restore Folders)
 ren "%AppData%\HueSync" "HueSync2"
 ren "%AppData%\HueSync_Temp" "HueSync"
 ren "%LocalAppData%\Signify" "Signify2"
