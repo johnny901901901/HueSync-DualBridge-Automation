@@ -1,4 +1,6 @@
 Set WshShell = CreateObject("WScript.Shell")
-' Ensure the path below matches your .bat location
+
+' Path must match your .bat location exactly
 WshShell.Run chr(34) & "C:\Scripts\HueDualLaunch.bat" & chr(34), 0, False
+
 Set WshShell = Nothing
