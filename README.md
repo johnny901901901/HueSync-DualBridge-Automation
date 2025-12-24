@@ -3,14 +3,14 @@
 A high-stability, community-driven automation method for running two independent instances of the Philips Hue Sync desktop app on one Windows PC. Optimized for dual-monitor setups where each display is controlled by a separate Philips Hue Bridge.
 
 ## 🚀 The Challenge
-The native Philips Hue Sync app is hard-coded to allow only one instance and one Bridge connection. Standard workarounds often suffer from "Identity Drift," where monitor or bridge assignments revert or swap after a system restart. This script creates a "Stability Shield" to mitigate those issues.
+The native Philips Hue Sync app is hard-coded to allow only one instance and one Bridge connection for dual monitor setups, you cannot use light sync for two separate displays at the same time.
 
 ## 🛠 Features
 - **Independent Identities:** Uses folder-swapping logic for `%AppData%` and `%LocalAppData%`, ensuring each instance keeps its unique Bridge API keys and Monitor selections.
 - **Instance Unlocking:** Uses the Sysinternals Handle tool to bypass the "Single Instance" lock.
 - **Invisible Startup:** Background execution via VBScript ensures zero CMD windows interrupt your workflow.
 - **High-Speed System Logic:** Specifically tuned for high-end hardware (tested on RTX 5090 / NVMe) to prevent configuration corruption.
-- 
+  
 ## 📦 Prerequisites: Mobile App Setup
 Before setting up the PC automation, you must ensure both Bridges are correctly linked to your Philips Hue account on your mobile device (iOS or Android).
 
